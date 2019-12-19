@@ -38,30 +38,24 @@ namespace MtgLabBrokerPortal.Controllers
 
         private List<FileData> AccessDatabase()
         {
-            List<FileData> fdList = new List<FileData>();
-            OleDbConnection conDatabase = null;
-            OleDbDataReader Dr = null;
-            conDatabase = new OleDbConnection("Provider=SQLOLEDB; Data Source=DESKTOP-DQBU44U\\BYTESOFTWARE; Initial Catalog=BytePro; User ID=sa; Password=bytepro;");
-            conDatabase.Open();
+            DataLayer dl = new DataLayer();
             string strSQL = "select * from FILEDATA";
-            OleDbCommand cmdDatabase = new OleDbCommand(strSQL, conDatabase);
-            Dr = cmdDatabase.ExecuteReader();
+            OleDbDataReader dr = dl.GetDataReader(strSQL);
+            List<FileData> fdList = new List<FileData>();
 
-            while (Dr.Read())
+            while (dr.Read())
             {
                 FileData fd = new FileData();
-                if(!String.IsNullOrEmpty(Dr["DateCreated"].ToString()))
-                    fd.DateCreated = DateTime.Parse(Dr["DateCreated"].ToString());
-                if (!String.IsNullOrEmpty(Dr["DateModified"].ToString()))
-                    fd.DateModified = DateTime.Parse(Dr["DateModified"].ToString());
-                fd.BorrowerNames = Dr["_AllBorrowerNames"].ToString();
-                fd.FileName = Dr["FileName"].ToString();
+                if(!String.IsNullOrEmpty(dr["DateCreated"].ToString()))
+                    fd.DateCreated = DateTime.Parse(dr["DateCreated"].ToString());
+                if (!String.IsNullOrEmpty(dr["DateModified"].ToString()))
+                    fd.DateModified = DateTime.Parse(dr["DateModified"].ToString());
+                fd.BorrowerNames = dr["_AllBorrowerNames"].ToString();
+                fd.FileName = dr["FileName"].ToString();
 
                 fdList.Add(fd);
             }
-
-            Dr.Close();
-            conDatabase.Close();
+            dl.Cleanup();
 
             return fdList;
         }

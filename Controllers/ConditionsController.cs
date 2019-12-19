@@ -38,29 +38,23 @@ namespace MtgLabBrokerPortal.Controllers
 
         private List<ConditionData> AccessDatabase()
         {
-            List<ConditionData> cList = new List<ConditionData>();
-            OleDbConnection conDatabase = null;
-            OleDbDataReader Dr = null;
-            conDatabase = new OleDbConnection("Provider=SQLOLEDB; Data Source=DESKTOP-DQBU44U\\BYTESOFTWARE; Initial Catalog=BytePro; User ID=sa; Password=bytepro;");
-            conDatabase.Open();
+            DataLayer dl = new DataLayer();
             string strSQL = "select * from CONDITION";
-            OleDbCommand cmdDatabase = new OleDbCommand(strSQL, conDatabase);
-            Dr = cmdDatabase.ExecuteReader();
+            OleDbDataReader dr = dl.GetDataReader(strSQL);
+            List<ConditionData> cList = new List<ConditionData>();
 
-            while (Dr.Read())
+            while (dr.Read())
             {
                 ConditionData cd = new ConditionData();
-                if(!String.IsNullOrEmpty(Dr["RequestedDate"].ToString()))
-                    cd.RequestedDate = DateTime.Parse(Dr["RequestedDate"].ToString());
-                cd.RequestedBy = Dr["RequestedBy"].ToString();
-                cd.Description = Dr["_Description"].ToString();
-                cd.ConditionTypeAndNo = Dr["_ConditionTypeAndNo"].ToString();
+                if(!String.IsNullOrEmpty(dr["RequestedDate"].ToString()))
+                    cd.RequestedDate = DateTime.Parse(dr["RequestedDate"].ToString());
+                cd.RequestedBy = dr["RequestedBy"].ToString();
+                cd.Description = dr["_Description"].ToString();
+                cd.ConditionTypeAndNo = dr["_ConditionTypeAndNo"].ToString();
 
                 cList.Add(cd);
             }
-
-            Dr.Close();
-            conDatabase.Close();
+            dl.Cleanup();
 
             return cList;
         }
